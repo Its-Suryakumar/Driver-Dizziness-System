@@ -81,7 +81,7 @@ while True:
 			print (flag)
 			if flag >= frame_check/2 - 1:
 				lcd.clear()
-				lcd.message('Warning! \nThreshold: ' + str(flag/frame_check))
+				lcd.message('Warning! \nThreshold: ' + str(round(flag/frame_check, 2))
 			elif flag >= frame_check:
 				lcd.clear()
 				lcd.message('Alert!!! SOS')
@@ -94,15 +94,15 @@ while True:
 					call.call("SOS!!! You've been registered as the emergency contact for <Person>")
 			else:
 				lcd.clear()
-				lcd.message('Detecting... \nThreshold: ' + str(flag/frame_check))
+				lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2))
 		else:
 			flag = 0.0
 			lcd.clear()
-			lcd.message('Detecting... \nThreshold: ' + str(flag/frame_check))
+			lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2))
 
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
 	if key == ord("x"):
-			cv2.destroyAllWindows()
-			cap.release()
-			break
+		cv2.destroyAllWindows()
+		cap.release()
+		break

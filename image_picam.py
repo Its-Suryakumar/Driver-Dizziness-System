@@ -14,7 +14,7 @@ import Adafruit_CharLCD as LCD
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(12, GPIO.OUT)
-p = GPIO.PWM(12, 1000)
+p = GPIO.PWM(12, 3000)
 p.start(50)
 
 # Raspberry Pi pin configuration:
@@ -32,7 +32,6 @@ lcd_rows = 2
 # Initialize the LCD using the pins above.
 lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7,
 							lcd_columns, lcd_rows, lcd_backlight)
-t = 0.01
 
 def eye_aspect_ratio(eye):
 	A = distance.euclidean(eye[1], eye[5])
@@ -103,7 +102,7 @@ while True:
 			lcd.clear()
 			lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2)))
 
-	if len(subject) == 0:
+	if len(subjects) == 0:
 		lcd.clear()
 		lcd.message('No eyes \ndetected...')
 

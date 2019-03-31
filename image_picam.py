@@ -78,11 +78,9 @@ while True:
 
 		if ear < thresh:
 			flag += 1.0
-			print (flag)
-			if flag >= frame_check/2 - 1:
-				lcd.clear()
-				lcd.message('Warning! \nThreshold: ' + str(round(flag/frame_check, 2))
-			elif flag >= frame_check:
+			print ('Threshold (' + str(flag) + '): ' + str(round(flag/frame_check, 2)))
+
+			if flag >= frame_check:
 				lcd.clear()
 				lcd.message('Alert!!! SOS')
 				cv2.putText(frame, "****************ALERT!****************", (10, 30),
@@ -92,13 +90,18 @@ while True:
 				if not reset:
 					reset = True
 					call.call("SOS!!! You've been registered as the emergency contact for <Person>")
+			
+			elif flag >= frame_check/2 - 1:
+				lcd.clear()
+				lcd.message('Warning! \nThreshold: ' + str(round(flag/frame_check, 2)))
+			
 			else:
 				lcd.clear()
-				lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2))
+				lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2)))
 		else:
 			flag = 0.0
 			lcd.clear()
-			lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2))
+			lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2)))
 
 	if len(subject) == 0:
 		lcd.clear()

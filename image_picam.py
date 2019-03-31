@@ -4,13 +4,10 @@ import imutils
 import dlib
 import cv2
 import numpy as np
-
+import time
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-
-import time
 import call
-
 import RPi.GPIO as GPIO
 import Adafruit_CharLCD as LCD
 
@@ -28,12 +25,13 @@ lcd_d5        = 17
 lcd_d6        = 18
 lcd_d7        = 22
 lcd_backlight = 4
+
 lcd_columns = 16
-lcd_rows    = 2
+lcd_rows = 2
 
 # Initialize the LCD using the pins above.
 lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7,
-                           lcd_columns, lcd_rows, lcd_backlight)
+							lcd_columns, lcd_rows, lcd_backlight)
 
     
 t = 0.01
@@ -45,7 +43,7 @@ def eye_aspect_ratio(eye):
     return ear
 
 thresh = 0.25
-frame_check = 5
+frame_check = 5.0
 detect = dlib.get_frontal_face_detector()
 predict = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
@@ -55,7 +53,7 @@ predict = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 cam = PiCamera()
 
 
-flag = 0
+flag = 0.0
 reset = False
 while True:
     imgResp = PiRGBArray(cam)
@@ -65,36 +63,40 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     subjects = detect(gray, 0)
     for subject in subjects:
-            shape = predict(gray, subject)
-            shape = face_utils.shape_to_np(shape)#converting to NumPy Array
-            leftEye = shape[lStart:lEnd]
-            rightEye = shape[rStart:rEnd]
-            leftEAR = eye_aspect_ratio(leftEye)
-            rightEAR = eye_aspect_ratio(rightEye)
-            ear = (leftEAR + rightEAR) / 2.0
-            leftEyeHull = cv2.convexHull(leftEye)
-            rightEyeHull = cv2.convexHull(rightEye)
-            cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
-            cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
-            if ear < thresh:
-                    flag += 1
-                    print (flag)
-                    if flag >= frame_check:
-                            lcd.clear()
-                            lcd.message('Alert!!! SOS')
-                            cv2.putText(frame, "****************ALERT!****************", (10, 30),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                            cv2.putText(frame, "****************ALERT!****************", (10,325),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                            if not reset:
-                                    reset = True
-                                    call.call("SOS!!! You've been registered as the emergency contact for <Person>")
-                    else:
-                        lcd.clear()
-                        lcd.message('Detecting...')
-            else:
-                    flag = 0
-    cv2.imshow("Frame", frame)
+		shape = predict(gray, subject)
+		shape = face_utils.shape_to_np(shape)#converting to NumPy Array
+		leftEye = shape[lStart:lEnd]
+		rightEye = shape[rStart:rEnd]
+		leftEAR = eye_aspect_ratio(leftEye)
+		rightEAR = eye_aspect_ratio(rightEye)
+		ear = (leftEAR + rightEAR) / 2.0
+		leftEyeHull = cv2.convexHull(leftEye)
+		rightEyeHull = cv2.convexHull(rightEye)
+		cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+		cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+		if ear < thresh:
+			flag += 1.0
+			print (flag)
+			if flag >= frame_check/2 - 1:
+				lcd.clear()
+				lcd.message('Warning! \n Threshold: ' + str(flag/frame_check))
+			if flag >= frame_check:
+				lcd.clear()
+				lcd.message('Alert!!! SOS')
+				cv2.putText(frame, "****************ALERT!****************", (10, 30),
+						cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+				cv2.putText(frame, "****************ALERT!****************", (10,325),
+						cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+				if not reset:
+						reset = True
+						call.call("SOS!!! You've been registered as the emergency contact for <Person>")
+			else:
+				lcd.clear()
+				lcd.message('Detecting... \n Threshold: ' + str(flag/frame_check))
+		else:
+			flag = 0.0
+    
+	cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord("x"):
             cv2.destroyAllWindows()

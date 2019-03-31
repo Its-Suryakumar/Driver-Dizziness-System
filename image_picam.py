@@ -100,6 +100,10 @@ while True:
 			lcd.clear()
 			lcd.message('Detecting... \nThreshold: ' + str(round(flag/frame_check, 2))
 
+	if len(subject) == 0:
+		lcd.clear()
+		lcd.message('No eyes \ndetected...')
+
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
 	if key == ord("x"):
